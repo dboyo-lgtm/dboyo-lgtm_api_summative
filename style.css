@@ -171,13 +171,13 @@ main {
     color: #c9d3e6;
 }
 
-.footer {
+footer {
     text-align: center;
     padding: 30px 20px;
     font-size: 0.85rem;
     color:#c9d3e6
 }
 
-footer a {
+.footer a {
     color: #ffd166;
 }

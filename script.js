@@ -4,20 +4,20 @@ const CITIES = [
     ["Kigali", "Rwanda", -1.9441, 30.0619], ["Nairobi", "Kenya", -1.2921, 36.8219],
     ["Lagos", "Nigeria", 6.5244, 3.3792], ["Cairo", "Egypt", 30.044, 31.2357],
     ["Cape Town", "South Africa", -33.9249, 18.4241], ["Paris", "France", 48.8566, 2.3522],
-    ["London", "UK", 51.5074, -0.1278], ["Öslo", "Norway", 59.9139, 10.7522],
+    ["London", "UK", 51.5074, -0.1278], ["Oslo", "Norway", 59.9139, 10.7522],
     ["Tromso", "Norway", 69.6492, 18.9553], ["Reykjavik", "Iceland", 64.1466, -21.9426],
     ["Moscow", "Russia", 55.7558, 37.6173], ["Dubai", "UAE", 25.2048, 55.2708],
-    ["Singapore", "Singapore", 1.3521, 103.8198], ["Toyko", "Japan", 35.6762, 139.6503],
+    ["Singapore", "Singapore", 1.3521, 103.8198], ["Tokyo", "Japan", 35.6762, 139.6503],
     ["Sydney", "Australia", -33.8688, 151.2093], ["New York", "USA", 40.7128, -74.006],
     ["Rio de Janeiro", "Brazil", -22.9068, -43.1729], ["Buenos Aires", "Argentina", -34.6037, -58.3816],
     ["Ushuaia", "Argentina", -54.8019, -68.303]
 ].map(([name, country, lat, lng,]) => ({ name, country, lat, lng, hemisphere: lat >= 0 ? "north" : "south"}));
 
 const API_URL = "https://api.sunrise-sunset.org/v2";
-const ERROR = {
+const ERRORS = {
     network: "Could not reach the Sunrise-Sunset API. Check your internet connection.",
     timeout: "The Sunrise-Sunset API is too slow right now. Please try again.",
-    busy: "They Sunrise-Sunset API is busy. Wait a minute, then click Retry",
+    busy: "The Sunrise-Sunset API is busy. Wait a minute, then click Retry",
     invalid: "Sunrise-Sunset API sent data we could not read",
     server: "The Sunrise-Sunset API is having problems. Please try again later."
 };
@@ -47,7 +47,7 @@ function showMessage(text = "", isError = false) {
 // Call the API for one city (10-seconds timeout)
 async function fetchCity(city, date) {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 1000);
+    const timer = setTimeout(() => controller.abort(), 10000);
     let response, data;
 
     try {
@@ -65,7 +65,7 @@ async function fetchCity(city, date) {
 
     try { data = await response.json(); } catch { throw "invalid"; }
     const info = data.results || data;
-    if (!info || !("daylength" in info)) throw "invalid";
+    if (!info || !("day_length" in info)) throw "invalid";
     return info;
 }
 
@@ -95,7 +95,7 @@ async function loadData() {
                 usableLight: secondsBetween(info.first_light, info.last_light)
             });
         } catch (error) {
-            lastError = typeof error === "String" ? error : "invalid";
+            lastError = typeof error === "string" ? error : "invalid";
             results.push({ ...city, ok: false });
         }
     }
@@ -129,17 +129,17 @@ function cardHTML(c) {
     if (!c.ok) return `<article class="card unavailable">${title}<p class="country">${escapeHTML(c.country)}</p><p class="status">Data unavailable right now.</p></article>`;
 
     const percent = Math.round(((c.dayLength || 0) /86400) * 100);
-    const status = {midnight_sun: "the sun never sets today.", polar_night: "Polar night: the sun never rises today"}[c.status];
+    const status = {midnight_sun: "☀️ the sun never sets today.", polar_night: " 🌑Polar night: the sun never rises today"}[c.status];
     
     return `<article class="card">${title}
-      <p class="country">${escapeHTML(c.country)} . ${c.hemisphere === "north" ? "Northern" : "Southern"} hemisphere</p>
+      <p class="country">${escapeHTML(c.country)} · ${c.hemisphere === "north" ? "Northern" : "Southern"} hemisphere</p>
       <p class="day-length">${formatDuration(c.dayLength)}</p>
-      <div class="bar"><div class="bar-fill" style="width:${percent}%"</div></div>
-      <div class="times"><span> Sunrise ${escapeHTML(formatTime(c.sunrise))}</span><span>
-      Sunset ${escapeHTML(formatTime(c.sunset))}</span></div>
-      <p class="usable"> Usable light: <strong>${formatTime(c.usableLight)}</strong><br>
-      <small>First light ${escapeHTML(formatTime(c.firstLight))} . Last light
-      ${escapeHTML(formatTime(c.lastLight))}</small><p>
+      <div class="bar"><div class="bar-fill" style="width:${percent}%"></div></div>
+      <div class="times"><span>🌅 Sunrise ${escapeHTML(formatTime(c.sunrise))}</span><span>
+      🌇 Sunset ${escapeHTML(formatTime(c.sunset))}</span></div></div>
+      <p class="usable">🔆 Usable light: <strong>${formatDuration(c.usableLight)}</strong><br>
+      <small>First light ${escapeHTML(formatTime(c.firstLight))} · Last light
+      ${escapeHTML(formatTime(c.lastLight))}</small></p>
       ${status ? `<p class="status">${status}</p>` : ""}
       </article>`;
 }
@@ -158,12 +158,12 @@ function render() {
     summary.textContent = withData.length < 2 ? "":
 
        `Longest day: ${longest.name} (${formatDuration(longest.dayLength)}) · Shortest day: 
-       ${shortest.name} (${formatDuration(shortest.dayLength)}) . Difference:
+       ${shortest.name} (${formatDuration(shortest.dayLength)}) · Difference:
        ${formatDuration(longest.dayLength - shortest.dayLength)}`;
 
     cityGrid.innerHTML = visible.length === 0 && cityResults.length > 0
       ? '<p class="empty">No city matches your search.</p>'
-      : visible.map(cardHTML).json("");
+      : visible.map(cardHTML).join("");
      
 }
 
