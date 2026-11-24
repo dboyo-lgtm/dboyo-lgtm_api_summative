@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daylight Around the World</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>☀️ Daylight Around the World /h1>
+        <p>Why is the day 12hours long in Kigali but only 7 hours in Oslo? See how lattitude and seasons change daylight around the world, and how many hours of usable light people have for outdoor work like building, travel, farming..etc.</p>
+    </header>
+
+    <main>
+        <section class="controls">
+            <label>
+                Date
+                <input type="date" id="date-input">
+            </label>
+
+            <label>
+                Search city
+                <input type="text" id="search-input" placeholder="e.g Kigali">
+            </label>
+
+            <label>
+                Hemisphere
+                <select id="hemisphere-select">
+                    <option value="all">All</option>
+                    <option value="north">Northern</option>
+                    <option value="south">Southern</option>
+                </select>
+            </label>
+
+            <label>
+                Sort by
+                <select id="sort-select">
+                    <option value="longest">Longest day first</option>
+                    <option value="shortest">Shortest day first</option>
+                    <option value="usable">Most usable light</option>
+                    <option value="sunrise">Earliest sunrise</option>
+                    <option value="shortest">City name (A-Z)</option>
+                </select>
+            </label>
+        </section>
+
+        <p id="message" class="message"></p>
+        <button id="retry-button" class="retry-button" hidden> Retry</button>
+
+        <p id="summary" class="summary"></p>
+
+        <section id="city-grid" class="city-grid"></section>
+    </main>
+
+    <footer>
+        Sun data by <a href="https://sunrise-sunset.org/" target="_blank" rel="noopener">Sunrise-Sunset.org</a>
+        Times are shown in each city's local time.
+    </footer>
+    
+</body>
+</html>
